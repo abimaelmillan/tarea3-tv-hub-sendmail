@@ -58,6 +58,19 @@ export async function sendReportCreatedEmail(report: ReportEmailData, channelNam
   // Construye la notificación de Report creado con los datos recibidos: canal,
   // reason, descripción, status y fecha de creación. Define un asunto adecuado
   // y usa el helper de transporte existente para enviarla con Nodemailer.
+  await sendWithTransporter({
+    from: env.smtpFrom,
+    to: env.reportNotificationEmail,
+    subject: `TV Hub - New Report: ${channelName}`,
+    text: [
+      'A new Report was created.',
+      `Channel: ${channelName}`,
+      `Reason: ${report.reason}`,
+      `Description: ${report.description}`,
+      `Status: ${report.status}`,
+      `Created at: ${report.createdAt.toLocaleString()}`
+    ].join('\n')
+  });
 }
 
 export async function sendReportResolvedEmail(report: ReportEmailData, channelName: string, recipient: string): Promise<void> {
@@ -66,4 +79,17 @@ export async function sendReportResolvedEmail(report: ReportEmailData, channelNa
   // Incluye información relevante como identificador, canal, status final y
   // fecha de resolución, además de datos del administrador si están disponibles.
   // Reutiliza el helper de transporte y el preview de Ethereal ya disponibles.
+  await sendWithTransporter({
+    from: env.smtpFrom,
+    to: recipient,
+    subject: `TV Hub - Your Report was resolved: ${channelName}`,
+    text: [
+      'Your Report was resolved by support.',
+      `Channel: ${channelName}`,
+      `Reason: ${report.reason}`,
+      `Description: ${report.description}`,
+      `Reported at: ${report.createdAt.toLocaleString()}`,
+      `Final status: ${report.status}`
+    ].join('\n')
+  });
 }
